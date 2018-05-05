@@ -8,14 +8,17 @@ import android.widget.Toast;
 
 public class EditNote extends AppCompatActivity {
 
+    String noteId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_note);
 
         Intent intent =getIntent();
+        noteId=intent.getStringExtra("noteId");
 
-        Toast.makeText(this,"Note : "+intent.getStringExtra("id"),Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"Note : "+noteId,Toast.LENGTH_LONG).show();
         // add back arrow to toolbar
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

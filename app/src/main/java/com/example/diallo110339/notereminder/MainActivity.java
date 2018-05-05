@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -28,14 +29,19 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //on vérifie si on arrive ici après une suppression de note
+        Intent intent =getIntent();
+        String lastActionType=intent.getStringExtra("actionType");
+        if (lastActionType !=null && lastActionType.equals("deletion"))
+            Toast.makeText(this,"Note supprimée avec succès",Toast.LENGTH_LONG).show();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                //         .setAction("Action", null).show();
-                Intent intent = new Intent(getApplicationContext(),NewNote.class);
-                startActivity(intent);
+                addNote();
             }
         });
 
@@ -53,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(),EditNote.class);
-                intent.putExtra("id",notes.get(position));
+                Intent intent = new Intent(getApplicationContext(),NoteDetailActivity.class);
+                intent.putExtra("noteId",notes.get(position));
                 startActivity(intent);
             }
         });
@@ -68,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+            public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -76,9 +82,15 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
+            addNote();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addNote(){
+        Intent intent = new Intent(getApplicationContext(),NewNote.class);
+        startActivity(intent);
     }
 }

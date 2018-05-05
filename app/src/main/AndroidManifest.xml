@@ -19,8 +19,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewNote" android:label="Nouvelle Note"/>
-        <activity android:name=".EditNote" android:label="Modifier une Note"></activity>
+        <activity
+            android:name=".NewNote"
+            android:label="Nouvelle Note" />
+        <activity
+            android:name=".EditNote"
+            android:label="Modifier une Note" />
+        <activity android:name=".NoteDetailActivity"></activity>
     </application>
 
 </manifest>
