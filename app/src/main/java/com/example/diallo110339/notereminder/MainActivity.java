@@ -3,24 +3,29 @@ package com.example.diallo110339.notereminder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.diallo110339.notereminder.adapter.DividerItemDecoration;
+import com.example.diallo110339.notereminder.adapter.NoteAdapter;
+import com.example.diallo110339.notereminder.adapter.RecyclerItemListener;
+import com.example.diallo110339.notereminder.adapter.VerticalSpacingDecoration;
+import com.example.diallo110339.notereminder.entity.Note;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ListView noteListView;
+    RecyclerView noteListView;
 
-    ArrayList<String> notes = new ArrayList<>();
+    ArrayList<Note> notes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,25 +50,50 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        noteListView = (ListView) findViewById(R.id.noteListeView);
+        noteListView = (RecyclerView) findViewById(R.id.noteListView);
 
-        notes.add("Note 1");
-        notes.add("Note 2");
-        notes.add("Note 3");
-        notes.add("Note 4");
-        notes.add("Note 5");
+        notes.add(new Note("Note 1","04/05/2018"));
+        notes.add(new Note("Note 2","12/05/2018"));
+        notes.add(new Note("Note 3","17/05/2018"));
+        notes.add(new Note("Note 4","23/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
+        notes.add(new Note("Note 5","27/05/2018"));
 
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1,notes);
-        noteListView.setAdapter(arrayAdapter);
+        NoteAdapter na = new NoteAdapter(notes);
+        noteListView.setAdapter(na);
 
-        noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(),NoteDetailActivity.class);
-                intent.putExtra("noteId",notes.get(position));
-                startActivity(intent);
-            }
-        });
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        noteListView.setLayoutManager(llm);
+
+        noteListView.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), noteListView,
+                new RecyclerItemListener.RecyclerTouchListener() {
+                    public void onClickItem(View v, int position) {
+                        Intent intent = new Intent(getApplicationContext(),NoteDetailActivity.class);
+                        intent.putExtra("note",notes.get(position).getTache());
+                        startActivity(intent);
+                    }
+
+                    public void onLongClickItem(View v, int position) {
+                        //System.out.println("On Long Click Item interface");
+                    }
+                }));
+
+        noteListView.addItemDecoration(new VerticalSpacingDecoration(64));
+
+        noteListView.addItemDecoration(
+                new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
+                        R.drawable.item_decorator)));
+
+
     }
 
     @Override
