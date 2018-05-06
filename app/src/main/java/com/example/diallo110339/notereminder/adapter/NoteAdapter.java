@@ -6,13 +6,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.diallo110339.notereminder.Helper.ItemTouchHelperAdapter;
 import com.example.diallo110339.notereminder.R;
 import com.example.diallo110339.notereminder.entity.Note;
 
+import java.util.Collections;
 import java.util.List;
 
 public class NoteAdapter extends
-        RecyclerView.Adapter<NoteAdapter.MyViewHolder> {
+        RecyclerView.Adapter<NoteAdapter.MyViewHolder>
+        implements ItemTouchHelperAdapter{
 
     private List<Note> noteList;
 
@@ -51,5 +54,28 @@ public class NoteAdapter extends
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.noterow,parent, false);
         return new MyViewHolder(v);
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        //remove the element
+        noteList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        //swap the elements
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(noteList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(noteList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 }

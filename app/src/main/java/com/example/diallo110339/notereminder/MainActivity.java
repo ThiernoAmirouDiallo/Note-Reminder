@@ -8,11 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.diallo110339.notereminder.Helper.SimpleItemTouchHelperCallback;
 import com.example.diallo110339.notereminder.adapter.DividerItemDecoration;
 import com.example.diallo110339.notereminder.adapter.NoteAdapter;
 import com.example.diallo110339.notereminder.adapter.RecyclerItemListener;
@@ -92,6 +94,13 @@ public class MainActivity extends AppCompatActivity {
         noteListView.addItemDecoration(
                 new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
                         R.drawable.item_decorator)));
+
+
+        //swipe & drap & drop
+        ItemTouchHelper.Callback callback =
+                new SimpleItemTouchHelperCallback(na);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(noteListView);
 
 
     }
