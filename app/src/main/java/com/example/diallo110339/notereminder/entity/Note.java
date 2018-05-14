@@ -10,9 +10,19 @@ public class Note {
 
     public Note(){}
 
-    public Note(String tache, String echeance){
+    public Note(Long id,
+            String user,
+            String tache,
+            String echeance,
+            int ordre,
+            String couleur
+    ){
+        this.id=id;
+        this.user=user;
         this.tache=tache;
         this.echeance=echeance;
+        this.ordre=ordre;
+        this.couleur=couleur;
     }
 
 
@@ -62,5 +72,17 @@ public class Note {
 
     public void setCouleur(String couleur) {
         this.couleur = couleur;
+    }
+
+    @Override
+    public String toString() {
+        return "Note{" +
+                "id=" + id +
+                ", user='" + user + '\'' +
+                ", tache='" + tache + '\'' +
+                ", echeance='" + echeance + '\'' +
+                ", ordre=" + ordre +
+                ", couleur='" + couleur + '\'' +
+                '}';
     }
 }
