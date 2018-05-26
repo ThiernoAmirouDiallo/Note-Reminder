@@ -1,16 +1,18 @@
 package com.example.diallo110339.notereminder.entity;
 
-public class Note {
-    Long id;
+import java.io.Serializable;
+
+public class Note implements Serializable{
+    Integer id;
     String user;
     String tache;
     String echeance;
-    int ordre;
+    Integer ordre;
     String couleur;
 
     public Note(){}
 
-    public Note(Long id,
+    public Note(Integer id,
             String user,
             String tache,
             String echeance,
@@ -26,11 +28,11 @@ public class Note {
     }
 
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -6,6 +6,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private final ItemTouchHelperAdapter mAdapter;
+    private RecyclerView mRecyclerView;
 
     public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
         mAdapter = adapter;
@@ -23,6 +24,8 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        this.mRecyclerView = recyclerView;
+
         int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
         int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
         return makeMovementFlags(dragFlags, swipeFlags);
@@ -37,7 +40,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+        //before undo confirmation
+        //mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+        //after
+        mAdapter.onItemRemove(viewHolder, mRecyclerView,viewHolder.getAdapterPosition());
     }
 
 }

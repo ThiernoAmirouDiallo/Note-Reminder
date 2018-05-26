@@ -3,8 +3,9 @@ package com.example.diallo110339.notereminder;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,10 +18,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.diallo110339.notereminder.Helper.SimpleItemTouchHelperCallback;
-import com.example.diallo110339.notereminder.adapter.DividerItemDecoration;
 import com.example.diallo110339.notereminder.adapter.NoteAdapter;
 import com.example.diallo110339.notereminder.adapter.RecyclerItemListener;
-import com.example.diallo110339.notereminder.adapter.VerticalSpacingDecoration;
 import com.example.diallo110339.notereminder.entity.ConnResultat;
 import com.example.diallo110339.notereminder.entity.ListResultat;
 import com.example.diallo110339.notereminder.entity.Note;
@@ -34,11 +33,10 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -51,27 +49,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView noteListView;
+    SwipeRefreshLayout swipeLayout;
+
 
     private static final String BASE_URL = "http://daviddurand.info/D228/reminder/";
     private static Retrofit retrofit = null;
 
-    ArrayList<Note> notes = new ArrayList<>();
+    List<Note> notes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //enabling auto cookies management
-        CookieManager cookieManager = new CookieManager();
-        CookieHandler.setDefault(cookieManager);
-
-
-        //OkHttpClient  okHttpClient = new OkHttpClient();
-        //OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
-
-        //okHttpClientBuilder.addInterceptor(new AddCookiesInterceptor(getApplicationContext())); // VERY VERY IMPORTANT
-        //okHttpClientBuilder.addInterceptor(new ReceivedCookiesInterceptor(getApplicationContext())); // VERY VERY IMPORTANT
-
-        //final OkHttpClient  okHttpClientCopy= okHttpClientBuilder.build();
-
+        //CookieManager cookieManager = new CookieManager();
+        //CookieHandler.setDefault(cookieManager);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -94,21 +84,44 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        setListContent();
+
+        // Getting SwipeContainerLayout
+        swipeLayout = findViewById(R.id.swipeContainer);
+        // Adding Listener
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code here
+                //Toast.makeText(getApplicationContext(), "Works!", Toast.LENGTH_LONG).show();
+                setListContent();
+
+                // To keep animation for 4 seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override public void run() {
+                        // Stop animation (This will be after 3 seconds)
+                        swipeLayout.setRefreshing(false);
+                    }
+                }, 4000); // Delay in millis
+            }
+        });
+
+        // Scheme colors for animation
+        swipeLayout.setColorSchemeColors(
+                getResources().getColor(android.R.color.darker_gray),
+                getResources().getColor(android.R.color.holo_green_light),
+                getResources().getColor(android.R.color.holo_orange_light),
+                getResources().getColor(android.R.color.holo_red_light)
+
+        );
+
+
+
+    }
+
+    private void setListContent() {
         noteListView = (RecyclerView) findViewById(R.id.noteListView);
 
-
-        //notes download
-        //ConnTask connTask = new ConnTask();
-        //connTask.execute("http://daviddurand.info/D228/reminder/connect/thierno/diallo");
-
-        //Retrofit sample
-        //Retrofit.Builder builder =new Retrofit.Builder()
-         //       .baseUrl("http://daviddurand.info/D228/reminder/")
-         //       .client(okHttpClientCopy)
-         //       .addConverterFactory(GsonConverterFactory.create())
-         //       ;
-
-        //Retrofit retrofit=builder.build();
 
         NoteReminderClient client = getClient().create(NoteReminderClient.class);
 
@@ -124,15 +137,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Notes","Connexion OK : "+resultat.toString());
 
 
-                //getting the notes list
-                //Retrofit.Builder builder =new Retrofit.Builder()
-                //        .baseUrl("http://daviddurand.info/D228/reminder/")
-                //        .client(okHttpClientCopy)
-                //        .addConverterFactory(GsonConverterFactory.create())
-                //        ;
-
-                //Retrofit retrofit=builder.build();
-
                 NoteReminderClient client = getClient().create(NoteReminderClient.class);
 
                 Call<ListResultat> call2 = client.getUserNotes();
@@ -142,13 +146,17 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(Call<ListResultat> call, Response<ListResultat> response) {
                         ListResultat resultat = response.body();
                         Log.i("Notes",response.body().getCode());
-                        Toast.makeText(getApplicationContext(),"Recuperation des notes OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),"Recuperation des notes OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
                         Log.i("Notes","Recuperation des notes OK : "+resultat.toString());
+
+                        //affectation du resultat a la liste
+                        notes=resultat.getData();
+                        fillList();
                     }
 
                     @Override
                     public void onFailure(Call<ListResultat> call, Throwable t) {
-                        Toast.makeText(getApplicationContext(),"Impossible de recuperer la liste des notes ",Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),"Impossible de recuperer la liste des notes ",Toast.LENGTH_LONG).show();
                         Log.i("Notes","Impossible de recuperer la liste des notes  : "+t.toString() + " " + t.getStackTrace());
 
                     }
@@ -177,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClickItem(View v, int position) {
                         Intent intent = new Intent(getApplicationContext(),NoteDetailActivity.class);
                         intent.putExtra("note",notes.get(position).getTache());
+                        intent.putExtra("noteObj",notes.get(position));
                         startActivity(intent);
                     }
 
@@ -185,11 +194,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }));
 
-        noteListView.addItemDecoration(new VerticalSpacingDecoration(64));
+        //noteListView.addItemDecoration(new VerticalSpacingDecoration(64));
 
-        noteListView.addItemDecoration(
-                new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
-                        R.drawable.item_decorator)));
+        //noteListView.addItemDecoration(
+        //        new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
+        //                R.drawable.item_decorator)));
 
 
         //swipe & drap & drop
@@ -294,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
                     JSONObject jsonPart = arr.getJSONObject(i);
 
-                    Long id = Long.parseLong(jsonPart.getString("id"));
+                    Integer id = Integer.parseInt(jsonPart.getString("id"));
                     String user=jsonPart.getString("user");
                     String tache=jsonPart.getString("tache");
                     String echeance=jsonPart.getString("echeance");
