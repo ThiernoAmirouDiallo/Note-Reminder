@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.diallo110339.notereminder.Helper.SimpleItemTouchHelperCallback;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private static Retrofit retrofit = null;
 
     List<Note> notes = new ArrayList<>();
+    RelativeLayout progressBarRelativeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+        progressBarRelativeLayout =(RelativeLayout) findViewById(R.id.progressBarRelativeLayout);
+        noteListView = (RecyclerView) findViewById(R.id.noteListView);
 
         //on vérifie si on arrive ici après une suppression de note
         Intent intent =getIntent();
@@ -120,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListContent() {
-        noteListView = (RecyclerView) findViewById(R.id.noteListView);
 
+        showLoading();
 
         NoteReminderClient client = getClient().create(NoteReminderClient.class);
 
@@ -152,12 +158,14 @@ public class MainActivity extends AppCompatActivity {
                         //affectation du resultat a la liste
                         notes=resultat.getData();
                         fillList();
+                        showList();
                     }
 
                     @Override
                     public void onFailure(Call<ListResultat> call, Throwable t) {
                         //Toast.makeText(getApplicationContext(),"Impossible de recuperer la liste des notes ",Toast.LENGTH_LONG).show();
                         Log.i("Notes","Impossible de recuperer la liste des notes  : "+t.toString() + " " + t.getStackTrace());
+                        showList();
 
                     }
                 });
@@ -166,10 +174,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(getApplicationContext(),"Connexion impossible",Toast.LENGTH_LONG).show();
+                showList();
             }
         });
 
 
+    }
+    public void showList(){
+        progressBarRelativeLayout.setVisibility(View.GONE);
+        noteListView.setVisibility(View.VISIBLE);
+    }
+
+    public void showLoading(){
+        noteListView.setVisibility(View.GONE);
+        progressBarRelativeLayout.setVisibility(View.VISIBLE);
     }
 
     public void fillList(){
