@@ -3,7 +3,6 @@ package com.example.diallo110339.notereminder;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +36,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     List<Note> notes = new ArrayList<>();
     RelativeLayout progressBarRelativeLayout;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //enabling auto cookies management
@@ -71,28 +72,30 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        progressBarRelativeLayout =(RelativeLayout) findViewById(R.id.progressBarRelativeLayout);
+        progressBarRelativeLayout = (RelativeLayout) findViewById(R.id.progressBarRelativeLayout);
         noteListView = (RecyclerView) findViewById(R.id.noteListView);
 
         //on vérifie si on arrive ici après une suppression de note
-        Intent intent =getIntent();
-        String lastActionType=intent.getStringExtra("actionType");
-        if (lastActionType !=null && lastActionType.equals("deletion"))
-            Toast.makeText(this,"Note supprimée avec succès",Toast.LENGTH_LONG).show();
+        Intent intent = getIntent();
+        String lastActionType = intent.getStringExtra("actionType");
+        if (lastActionType != null && lastActionType.equals("deletion"))
+            Toast.makeText(this, "Note supprimée avec succès", Toast.LENGTH_LONG).show();
+        else if (lastActionType != null && lastActionType.equals("add"))
+            Toast.makeText(this, "Note ajoutée avec succès", Toast.LENGTH_LONG).show();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-               //         .setAction("Action", null).show();
+                // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //         .setAction("Action", null).show();
                 addNote();
             }
         });
 
         setListContent();
 
-        // Getting SwipeContainerLayout
+        /* / Getting SwipeContainerLayout
         swipeLayout = findViewById(R.id.swipeContainer);
         // Adding Listener
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getColor(android.R.color.holo_red_light)
 
         );
-
+*/
 
 
     }
@@ -138,9 +141,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ConnResultat> call, Response<ConnResultat> response) {
                 ConnResultat resultat = response.body();
-                Log.i("res",response.body().getCode());
-                Toast.makeText(getApplicationContext(),"Connexion OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
-                Log.i("Notes","Connexion OK : "+resultat.toString());
+                //Log.i("res",response.body().getCode());
+                //Toast.makeText(getApplicationContext(),"Connexion OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
+                //Log.i("Notes","Connexion OK : "+resultat.toString());
 
 
                 NoteReminderClient client = getClient().create(NoteReminderClient.class);
@@ -151,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ListResultat> call, Response<ListResultat> response) {
                         ListResultat resultat = response.body();
-                        Log.i("Notes",response.body().getCode());
+                        //Log.i("Notes",response.body().getCode());
                         //Toast.makeText(getApplicationContext(),"Recuperation des notes OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
-                        Log.i("Notes","Recuperation des notes OK : "+resultat.toString());
+                        //Log.i("Notes","Recuperation des notes OK : "+resultat.toString());
 
                         //affectation du resultat a la liste
                         notes=resultat.getData();
@@ -191,8 +194,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fillList(){
+        Collections.sort(notes);
         NoteAdapter na = new NoteAdapter(notes);
         noteListView.setAdapter(na);
+
+
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -223,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper.Callback callback =
                 new SimpleItemTouchHelperCallback(na);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        na.setTouchHelper(touchHelper);
         touchHelper.attachToRecyclerView(noteListView);
 
 
@@ -246,13 +253,22 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_add) {
             addNote();
             return true;
+        } else if (id == R.id.action_refresh)
+        {
+            setListContent();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     public void addNote(){
+        //on recupere le plus petit ordre ou 1000 (pour decrementer par la suit)
+        Integer smallestOrder=notes.size()>0?notes.get(0).getOrdre():1000;
+
         Intent intent = new Intent(getApplicationContext(),NewNote.class);
+        intent.putExtra("smallestOrder",smallestOrder.toString());
+        //intent.putExtra("noteObj",notes.get(position));
         startActivity(intent);
     }
 

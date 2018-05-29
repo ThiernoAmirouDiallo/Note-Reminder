@@ -12,6 +12,8 @@ public interface ItemTouchHelperAdapter {
 
     void restoreItem(Note note, int position);
 
-    public void onItemRemove(final RecyclerView.ViewHolder viewHolder, final RecyclerView mRecyclerView, final int position);
+    void onItemRemove(final RecyclerView.ViewHolder viewHolder, final RecyclerView mRecyclerView, final int position);
 
-    }
+    void onDrop(int fromPosition, int toPosition) ;
+
+}

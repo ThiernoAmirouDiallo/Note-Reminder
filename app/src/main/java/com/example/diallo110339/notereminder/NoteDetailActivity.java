@@ -2,12 +2,17 @@ package com.example.diallo110339.notereminder;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.diallo110339.notereminder.entity.ListResultat;
@@ -22,6 +27,14 @@ public class NoteDetailActivity extends AppCompatActivity {
 
     String noteId;
     Note note;
+
+    EditText edittext;
+    TextView colorTextViewPreview;
+    EditText tacheEditText;
+    //ProgressBar loadingSpinner;
+    Button editButton;
+    Spinner spinner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,14 +43,28 @@ public class NoteDetailActivity extends AppCompatActivity {
         Intent intent =getIntent();
         noteId=intent.getStringExtra("noteId");
         note = (Note) intent.getSerializableExtra("noteObj");
-        Toast.makeText(NoteDetailActivity.this, "Note : "+note,Toast.LENGTH_LONG).show();
+        //Toast.makeText(NoteDetailActivity.this, "Note : "+note,Toast.LENGTH_LONG).show();
 // add back arrow to toolbar
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
+        editButton= (Button) findViewById(R.id.echeanceButton);
+        spinner = (Spinner)findViewById(R.id.couleurSpinner);
 
+        edittext= (EditText) findViewById(R.id.echeanceEditText);
+        colorTextViewPreview= (TextView) findViewById(R.id.colorPreviewTextView);
+        tacheEditText= (EditText) findViewById(R.id.tacheEditText);
+        //loadingSpinner= (ProgressBar) findViewById(R.id.progressBar);
+
+        editButton.setVisibility(View.GONE);
+        spinner.setVisibility(View.GONE);
+
+        tacheEditText.setText(note.getTache());
+        tacheEditText.setEnabled(false);
+        edittext.setText(note.getEcheance());
+        colorTextViewPreview.setBackgroundColor(Color.parseColor(note.getCouleur()));
     }
 
     @Override

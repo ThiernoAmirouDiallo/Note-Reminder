@@ -1,8 +1,10 @@
 package com.example.diallo110339.notereminder.entity;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
-public class Note implements Serializable{
+public class Note implements Serializable, Comparable<Note>{
     Integer id;
     String user;
     String tache;
@@ -86,5 +88,10 @@ public class Note implements Serializable{
                 ", ordre=" + ordre +
                 ", couleur='" + couleur + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(@NonNull Note o) {
+        return ordre<o.ordre?-1:ordre==o.ordre?0:1;
     }
 }

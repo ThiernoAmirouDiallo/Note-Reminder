@@ -3,9 +3,12 @@ package com.example.diallo110339.notereminder.adapter;
 import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +33,7 @@ public class NoteAdapter extends
 
     private List<Note> noteList;
     private Note note;
+    private ItemTouchHelper touchHelper;
 
     /**
      * View holder class
@@ -37,11 +41,13 @@ public class NoteAdapter extends
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView tacheText;
         public TextView echeanceText;
+        ImageView reorderView;
 
         public MyViewHolder(View view) {
             super(view);
-            tacheText = (TextView) view.findViewById(R.id.tacheTextView);
+            tacheText = (TextView) view.findViewById(R.id.tacheEditText);
             echeanceText = (TextView) view.findViewById(R.id.echeanceTextView);
+            reorderView = (ImageView )view.findViewById(R.id.imageViewReorder);
         }
     }
 
@@ -50,12 +56,28 @@ public class NoteAdapter extends
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         Note n = noteList.get(position);
         holder.tacheText.setText(n.getTache());
         holder.echeanceText.setText(n.getEcheance());
 
         holder.itemView.setBackgroundColor(Color.parseColor(n.getCouleur()));
+
+        if (n.getCouleur().equals("#000000"))
+        {
+            holder.tacheText.setTextColor(Color.parseColor("#FFFFFF"));
+            holder.echeanceText.setTextColor(Color.parseColor("#FFFFFF"));
+        }
+
+        ((MyViewHolder) holder).reorderView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                    touchHelper.startDrag(holder);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -125,6 +147,9 @@ public class NoteAdapter extends
         snackbar.show();
 
     }
+
+
+
     public  void deleteNote(final int position){
         NoteReminderClient client = MainActivity.getClient().create(NoteReminderClient.class);
 
@@ -143,4 +168,16 @@ public class NoteAdapter extends
             }
         });
     }
+
+
+
+    public void onDrop(int fromPosition, int toPosition) {
+        Toast.makeText(MyApplication.getAppContext(),"Moved from "+ fromPosition +" to "+toPosition,Toast.LENGTH_LONG).show();
+    }
+
+    public void setTouchHelper(ItemTouchHelper touchHelper) {
+
+        this.touchHelper = touchHelper;
+    }
+
 }

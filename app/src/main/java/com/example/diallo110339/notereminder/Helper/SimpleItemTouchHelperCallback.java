@@ -5,6 +5,10 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
+    int dragFrom = -1;
+    int dragTo = -1;
+
+
     private final ItemTouchHelperAdapter mAdapter;
     private RecyclerView mRecyclerView;
 
@@ -34,6 +38,16 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
+        if (target.getItemViewType() != target.getItemViewType()) {
+            return false;
+        }
+
+        // remember FIRST from position
+        if (dragFrom == -1)
+            dragFrom = target.getAdapterPosition();
+        dragTo = target.getAdapterPosition();
+
+
         mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
@@ -45,5 +59,19 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         //after
         mAdapter.onItemRemove(viewHolder, mRecyclerView,viewHolder.getAdapterPosition());
     }
+
+    @Override
+    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        super.clearView(recyclerView, viewHolder);
+        System.out.println( "Moved from "+ dragFrom +" to "+dragTo);
+
+        if(dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+            mAdapter.onDrop(dragFrom, dragTo);
+        }
+
+        dragFrom = dragTo = -1;
+    }
+
+
 
 }

@@ -7,4 +7,10 @@
         android:orderInCategory="100"
         android:title="Add"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="100"
+        android:title="Actualiser"
+        app:showAsAction="never" />
 </menu>

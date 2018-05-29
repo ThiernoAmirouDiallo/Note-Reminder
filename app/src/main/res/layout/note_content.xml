@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView16"
+            style="@android:style/TextAppearance.Holo.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Tâche"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25sp" />
+
+        <EditText
+            android:id="@+id/tacheEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:hint="Description de la tâche"
+            android:inputType="textMultiLine"
+            android:maxLines="5"
+            android:minLines="2"
+            android:textColor="@android:color/background_dark"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/textView18"
+            style="@android:style/TextAppearance.Holo.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Date d'écheance"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25sp" />
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/echeanceEditText"
+                android:layout_width="263dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:clickable="false"
+                android:cursorVisible="false"
+                android:editable="false"
+                android:ems="10"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint="Echeance"
+                android:inputType="datetime"
+                android:textColor="@android:color/background_dark"
+                android:textSize="25sp" />
+
+
+            <Button
+                android:id="@+id/echeanceButton"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/echeanceEditText"
+                android:layout_marginEnd="30dp"
+                android:text="..."
+                android:layout_marginRight="30dp" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/textView17"
+            style="@android:style/TextAppearance.Holo.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Couleur"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Spinner
+                android:id="@+id/couleurSpinner"
+                android:layout_width="201dp"
+                android:layout_height="49dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/colorPrimaryDark"></Spinner>
+
+            <TextView
+                android:id="@+id/colorPreviewTextView"
+                android:layout_width="125dp"
+                android:layout_height="49dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="23dp"
+                android:layout_marginRight="23dp" />
+
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>
