@@ -130,6 +130,10 @@ public class NewNote extends AppCompatActivity {
             spinner.setSelection(getColorIndex(note.getCouleur()));
 
         }
+
+        //on positionne le curseur dans le champ tache
+        tacheEditText.setSelection(tacheEditText.length());
+
         //Toast.makeText(getApplicationContext(),smallestOrder+note.toString(),Toast.LENGTH_LONG).show();
 
         date = new DatePickerDialog.OnDateSetListener() {

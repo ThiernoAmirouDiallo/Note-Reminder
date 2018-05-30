@@ -44,7 +44,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
         // remember FIRST from position
         if (dragFrom == -1)
-            dragFrom = target.getAdapterPosition();
+            dragFrom = viewHolder.getAdapterPosition();
         dragTo = target.getAdapterPosition();
 
 
@@ -63,7 +63,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
-        System.out.println( "Moved from "+ dragFrom +" to "+dragTo);
+        //System.out.println( "Moved from "+ dragFrom +" to "+dragTo);
 
         if(dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
             mAdapter.onDrop(dragFrom, dragTo);

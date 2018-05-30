@@ -15,8 +15,10 @@ import android.widget.Toast;
 import com.example.diallo110339.notereminder.Helper.ItemTouchHelperAdapter;
 import com.example.diallo110339.notereminder.MainActivity;
 import com.example.diallo110339.notereminder.R;
+import com.example.diallo110339.notereminder.entity.AjoutModifResultat;
 import com.example.diallo110339.notereminder.entity.ListResultat;
 import com.example.diallo110339.notereminder.entity.Note;
+import com.example.diallo110339.notereminder.entity.NoteToPost;
 import com.example.diallo110339.notereminder.retrofitClient.MyApplication;
 import com.example.diallo110339.notereminder.retrofitClient.NoteReminderClient;
 
@@ -119,7 +121,12 @@ public class NoteAdapter extends
                 Collections.swap(noteList, i, i - 1);
             }
         }
+        //on switch au fur et a mesure qu'il y a deplacement.
+        //si le web service implementait le switch du coté backend,
+        // on aurait envoyé une seule requte de switch après le drop dans la methode onDrop ci-dessous
+        switchNotes(fromPosition,toPosition);
         notifyItemMoved(fromPosition, toPosition);
+
         return true;
     }
 
@@ -169,10 +176,73 @@ public class NoteAdapter extends
         });
     }
 
+    public void switchNotes(int fromPosition, int toPosition){
+        Note note1 = noteList.get(fromPosition);
+        Note note2 = noteList.get(toPosition);
+
+        int note1Odre = note1.getOrdre();
+        note1.setOrdre(note2.getOrdre());
+        note2.setOrdre(note1Odre);
+
+
+        final NoteReminderClient client = MainActivity.getClient().create(NoteReminderClient.class);
+        NoteToPost noteToPost1 =new NoteToPost();
+        noteToPost1.setId(note1.getId());
+        noteToPost1.setC(note1.getCouleur());
+        noteToPost1.setE(note1.getEcheance());
+        noteToPost1.setTexte(note1.getTache());
+        noteToPost1.setO(note1.getOrdre());
+
+        final NoteToPost noteToPost2 =new NoteToPost();
+        noteToPost2.setId(note2.getId());
+        noteToPost2.setC(note2.getCouleur());
+        noteToPost2.setE(note2.getEcheance());
+        noteToPost2.setTexte(note2.getTache());
+        noteToPost2.setO(note2.getOrdre());
+
+        Call<AjoutModifResultat> call = client.updateNote(noteToPost1.getId(),noteToPost1.getId(),noteToPost1.getTexte(),noteToPost1.getO(),noteToPost1.getC(),noteToPost1.getE());
+
+        call.enqueue(new Callback<AjoutModifResultat>() {
+            @Override
+            public void onResponse(Call<AjoutModifResultat> call, Response<AjoutModifResultat> response) {
+                AjoutModifResultat resultat = response.body();
+
+                //mise a jour de la deuxième note
+                Call<AjoutModifResultat> call2 = client.updateNote(noteToPost2.getId(),noteToPost2.getId(),noteToPost2.getTexte(),noteToPost2.getO(),noteToPost2.getC(),noteToPost2.getE());
+
+                call2.enqueue(new Callback<AjoutModifResultat>() {
+                    @Override
+                    public void onResponse(Call<AjoutModifResultat> call, Response<AjoutModifResultat> response) {
+                        AjoutModifResultat resultat = response.body();
+                    }
+
+                    @Override
+                    public void onFailure(Call<AjoutModifResultat> call, Throwable t) {
+                        Toast.makeText(MyApplication.getAppContext(),"Une erreur est survenue pendant la mise à jour",Toast.LENGTH_LONG).show();
+                        //Log.i("Notes","Impossible de modifier la note : "+t.toString() + " " + t.getStackTrace());
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(Call<AjoutModifResultat> call, Throwable t) {
+                Toast.makeText(MyApplication.getAppContext(),"Une erreur est survenue pendant la mise à jour",Toast.LENGTH_LONG).show();
+                //Log.i("Notes","Impossible de modifier la note : "+t.toString() + " " + t.getStackTrace());
+
+            }
+        });
+
+    }
 
 
     public void onDrop(int fromPosition, int toPosition) {
-        Toast.makeText(MyApplication.getAppContext(),"Moved from "+ fromPosition +" to "+toPosition,Toast.LENGTH_LONG).show();
+        //on switch une fois à la fin
+        //si le web service implementait le switch du coté backend,
+        // on aurait envoyé une seule requte de switch après le drop ici
+        //switchNotes(fromPosition,toPosition);
+        //Toast.makeText(MyApplication.getAppContext(),"Moved from "+ fromPosition +" to "+toPosition,Toast.LENGTH_LONG).show();
     }
 
     public void setTouchHelper(ItemTouchHelper touchHelper) {
