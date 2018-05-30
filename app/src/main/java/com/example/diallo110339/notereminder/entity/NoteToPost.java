@@ -1,6 +1,7 @@
 package com.example.diallo110339.notereminder.entity;
 
 public class NoteToPost {
+    Integer id;
     String texte;
     String e;
     Integer o;
@@ -38,10 +39,19 @@ public class NoteToPost {
         this.c = c;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "NoteToPost{" +
-                "texte='" + texte + '\'' +
+                "id=" + id +
+                ", texte='" + texte + '\'' +
                 ", e='" + e + '\'' +
                 ", o=" + o +
                 ", c='" + c + '\'' +

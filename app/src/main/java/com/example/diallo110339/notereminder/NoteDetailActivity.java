@@ -34,6 +34,7 @@ public class NoteDetailActivity extends AppCompatActivity {
     //ProgressBar loadingSpinner;
     Button editButton;
     Spinner spinner;
+    TextView colorTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class NoteDetailActivity extends AppCompatActivity {
 
         editButton= (Button) findViewById(R.id.echeanceButton);
         spinner = (Spinner)findViewById(R.id.couleurSpinner);
+        colorTextView = (TextView) findViewById(R.id.colorTextView);
 
         edittext= (EditText) findViewById(R.id.echeanceEditText);
         colorTextViewPreview= (TextView) findViewById(R.id.colorPreviewTextView);
@@ -65,6 +67,11 @@ public class NoteDetailActivity extends AppCompatActivity {
         tacheEditText.setEnabled(false);
         edittext.setText(note.getEcheance());
         colorTextViewPreview.setBackgroundColor(Color.parseColor(note.getCouleur()));
+
+        int colorPosition =NewNote.getColorIndex(note.getCouleur());
+
+        colorTextView.setText(NewNote.couleursNames[colorPosition]);
+        colorTextView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -97,8 +104,8 @@ public class NoteDetailActivity extends AppCompatActivity {
     }
 
     public void editButtonClicked(View view){
-        Intent intent = new Intent(getApplicationContext(),EditNote.class);
-        intent.putExtra("noteId",noteId);
+        Intent intent = new Intent(getApplicationContext(),NewNote.class);
+        intent.putExtra("typeCrud","MODIFICATION");
         intent.putExtra("noteObj",note);
         startActivity(intent);
     }

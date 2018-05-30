@@ -20,12 +20,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.diallo110339.notereminder.entity.AjoutModifResultat;
+import com.example.diallo110339.notereminder.entity.Note;
 import com.example.diallo110339.notereminder.entity.NoteToPost;
 import com.example.diallo110339.notereminder.retrofitClient.NoteReminderClient;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,7 +38,7 @@ import retrofit2.Response;
 public class NewNote extends AppCompatActivity {
 
     Spinner spinner;
-    private static final String[] couleursNames = {"ROUGE",
+    public static final String[] couleursNames = {"ROUGE",
             "ORANGE",
             "JAUNE",
             "VIOLET",
@@ -51,7 +53,7 @@ public class NewNote extends AppCompatActivity {
             "GRIS",
             "NOIR"
     };
-    private static final String[] couleursCodes = {"#FF0000","#FFA500","#FFFF00","#EE82EE","#FF00FF","#8A2BE2","#008000","#0000FF","#DAA520","#FFFFFF","#F5F5DC","#C0C0C0","#808080","#000000"};
+    public static final String[] couleursCodes = {"#FF0000","#FFA500","#FFFF00","#EE82EE","#FF00FF","#8A2BE2","#008000","#0000FF","#DAA520","#FFFFFF","#F5F5DC","#C0C0C0","#808080","#000000"};
     Calendar myCalendar = Calendar.getInstance();
     EditText edittext;
     Button editButton;
@@ -61,6 +63,8 @@ public class NewNote extends AppCompatActivity {
     int smallestOrder;
     Button submitButton;
     ProgressBar loadingSpinner;
+    String typeCrud;
+    Note note = new Note();
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -74,12 +78,15 @@ public class NewNote extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-        Intent intent =getIntent();
-        smallestOrder =Integer.parseInt(intent.getStringExtra("smallestOrder"));
-        //Toast.makeText(getApplicationContext(),intent.getStringExtra("smallestOrder"),Toast.LENGTH_LONG).show();
 
-
+        editButton= (Button) findViewById(R.id.echeanceButton);
+        edittext= (EditText) findViewById(R.id.echeanceEditText);
+        colorTextViewPreview= (TextView) findViewById(R.id.colorPreviewTextView);
+        tacheEditText= (EditText) findViewById(R.id.tacheEditText);
+        submitButton =(Button) findViewById(R.id.submitButton);
+        loadingSpinner= (ProgressBar) findViewById(R.id.progressBar);
         spinner = (Spinner)findViewById(R.id.couleurSpinner);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(NewNote.this,
                 android.R.layout.simple_spinner_item,couleursNames);
 
@@ -101,13 +108,29 @@ public class NewNote extends AppCompatActivity {
             }
         });
 
-        editButton= (Button) findViewById(R.id.echeanceButton);
-        edittext= (EditText) findViewById(R.id.echeanceEditText);
-        colorTextViewPreview= (TextView) findViewById(R.id.colorPreviewTextView);
-        tacheEditText= (EditText) findViewById(R.id.tacheEditText);
-        submitButton =(Button) findViewById(R.id.submitButton);
-        loadingSpinner= (ProgressBar) findViewById(R.id.progressBar);
+        Intent intent =getIntent();
+        typeCrud=intent.getStringExtra("typeCrud");
+        if (typeCrud.equals("ADD"))
+        {
+            smallestOrder =Integer.parseInt(intent.getStringExtra("smallestOrder"));
+            submitButton.setText("Valider");
 
+            //mettre des couleurs par defaut de façon aleatoire
+            int randomPosition =new Random().nextInt(this.couleursCodes.length);
+            spinner.setSelection(randomPosition);
+            //colorTextViewPreview.setBackgroundColor(Color.parseColor(couleursCodes[randomPosition]));
+        }
+        else {
+            note = (Note) intent.getSerializableExtra("noteObj");
+
+            edittext.setText(note.getEcheance());
+            tacheEditText.setText(note.getTache());
+            submitButton.setText("Modifier");
+            //colorTextViewPreview.setBackgroundColor(Color.parseColor(note.getCouleur()));
+            spinner.setSelection(getColorIndex(note.getCouleur()));
+
+        }
+        //Toast.makeText(getApplicationContext(),smallestOrder+note.toString(),Toast.LENGTH_LONG).show();
 
         date = new DatePickerDialog.OnDateSetListener() {
 
@@ -145,7 +168,6 @@ public class NewNote extends AppCompatActivity {
             }
         });
 
-        colorTextViewPreview.setBackgroundColor(Color.parseColor(couleursCodes[0]));
 
     }
 
@@ -202,7 +224,42 @@ public class NewNote extends AppCompatActivity {
         });
     }
 
+    public  void editNote(){
+        NoteReminderClient client = MainActivity.getClient().create(NoteReminderClient.class);
+        NoteToPost note =new NoteToPost();
+        note.setId(this.note.getId());
+        note.setC(couleursCodes[spinner.getSelectedItemPosition()]);
+        note.setE(edittext.getText().toString());
+        note.setTexte(tacheEditText.getText().toString());
+        note.setO(this.note.getOrdre());
+
+        Call<AjoutModifResultat> call = client.updateNote(note.getId(),note.getId(),note.getTexte(),note.getO(),note.getC(),note.getE());
+
+        call.enqueue(new Callback<AjoutModifResultat>() {
+            @Override
+            public void onResponse(Call<AjoutModifResultat> call, Response<AjoutModifResultat> response) {
+                AjoutModifResultat resultat = response.body();
+                //Log.i("Notes",response.body().getCode());
+                //Toast.makeText(NewNote.this, "Modification de la note OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
+                //Log.i("Notes","Modification de la note OK : "+resultat.toString());
+
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                intent.putExtra("actionType","modif");
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFailure(Call<AjoutModifResultat> call, Throwable t) {
+                showButton();
+                Toast.makeText(getApplicationContext(),"Impossible de modifier la note ",Toast.LENGTH_LONG).show();
+                //Log.i("Notes","Impossible de modifier la note : "+t.toString() + " " + t.getStackTrace());
+
+            }
+        });
+    }
+
     public void submitForm(View v){
+        //validation du formulaire
         showSpiner();
         if(tacheEditText.getText().length()<2)
         {
@@ -219,7 +276,11 @@ public class NewNote extends AppCompatActivity {
             return;
         }
 
-        addNote();
+        //execution
+        if (typeCrud.equals("ADD"))
+            addNote();
+        else
+            editNote();
     }
 
     private void showButton() {
@@ -230,5 +291,18 @@ public class NewNote extends AppCompatActivity {
     private void showSpiner() {
         loadingSpinner.setVisibility(View.VISIBLE);
         submitButton.setVisibility(View.GONE);
+    }
+
+    public static int getColorIndex(String couleur) {
+        int colorPosition =-1;
+
+        for (String color : NewNote.couleursCodes){
+            colorPosition++;
+            if (color.equals(couleur)){
+                break;
+            }
+        }
+
+        return colorPosition;
     }
 }

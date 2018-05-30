@@ -27,7 +27,6 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="14dp"
             android:layout_marginRight="14dp"
-            android:drawableLeft="@android:drawable/ic_menu_delete"
             android:onClick="submitForm"
             android:text="Créer" />
 

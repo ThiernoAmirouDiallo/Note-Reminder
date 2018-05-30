@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Note supprimée avec succès", Toast.LENGTH_LONG).show();
         else if (lastActionType != null && lastActionType.equals("add"))
             Toast.makeText(this, "Note ajoutée avec succès", Toast.LENGTH_LONG).show();
+        else if (lastActionType != null && lastActionType.equals("modif"))
+            Toast.makeText(this, "Note modifiée avec succès", Toast.LENGTH_LONG).show();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -267,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
         Integer smallestOrder=notes.size()>0?notes.get(0).getOrdre():1000;
 
         Intent intent = new Intent(getApplicationContext(),NewNote.class);
+        intent.putExtra("typeCrud","ADD");
         intent.putExtra("smallestOrder",smallestOrder.toString());
         //intent.putExtra("noteObj",notes.get(position));
         startActivity(intent);
