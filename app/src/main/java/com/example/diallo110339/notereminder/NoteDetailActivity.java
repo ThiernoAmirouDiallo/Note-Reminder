@@ -119,9 +119,9 @@ public class NoteDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ListResultat> call, Response<ListResultat> response) {
                 ListResultat resultat = response.body();
-                Log.i("Notes",response.body().getCode());
-                Toast.makeText(NoteDetailActivity.this, "Suppression de la note OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
-                Log.i("Notes","Suppression de la note OK : "+resultat.toString());
+                //Log.i("Notes",response.body().getCode());
+                //Toast.makeText(NoteDetailActivity.this, "Suppression de la note OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
+                //Log.i("Notes","Suppression de la note OK : "+resultat.toString());
 
                 // and show the note list
                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
@@ -131,8 +131,8 @@ public class NoteDetailActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ListResultat> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Impossible de supprimer la note ",Toast.LENGTH_LONG).show();
-                Log.i("Notes","Impossible de supprimer la note : "+t.toString() + " " + t.getStackTrace());
+                Toast.makeText(getApplicationContext(),"Erreur pendant la suppression de la note",Toast.LENGTH_LONG).show();
+                Log.i("Notes","Erreur pendant la suppression de la note "+t.toString() + " " + t.getStackTrace());
 
             }
         });

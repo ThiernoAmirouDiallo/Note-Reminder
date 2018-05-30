@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -166,11 +167,13 @@ public class NoteAdapter extends
             @Override
             public void onResponse(Call<ListResultat> call, Response<ListResultat> response) {
                 ListResultat resultat = response.body();
+                Toast.makeText(MyApplication.getAppContext(),"La note a été supprimée avec succès.",Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFailure(Call<ListResultat> call, Throwable t) {
                 restoreItem(note,position);
+                Log.i("Notes","Erreur pendant la suppression de la note "+t.toString() + " " + t.getStackTrace());
                 Toast.makeText(MyApplication.getAppContext(),"Erreur de suppression de la note.",Toast.LENGTH_LONG).show();
             }
         });
