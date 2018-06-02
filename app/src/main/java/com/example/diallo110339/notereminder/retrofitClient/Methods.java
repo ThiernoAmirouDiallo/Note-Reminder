@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import java.util.HashSet;
 
+//getter et setter de cookies
 public class Methods {
 
     public static HashSet<String> getCookies(Context context) {

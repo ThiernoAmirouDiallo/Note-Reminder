@@ -93,7 +93,7 @@ public class NoteDetailActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        //delete the note
+                        //suppression de la note sur click sur le bouton OUI
                         deleteNote();
 
                     }
@@ -103,6 +103,7 @@ public class NoteDetailActivity extends AppCompatActivity {
                 .show();
     }
 
+    //click sur le boutton modification on redirige sur la vue modification
     public void editButtonClicked(View view){
         Intent intent = new Intent(getApplicationContext(),NewNote.class);
         intent.putExtra("typeCrud","MODIFICATION");
@@ -110,12 +111,14 @@ public class NoteDetailActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    //suppression de la note
     public  void deleteNote(){
         NoteReminderClient client = MainActivity.getClient().create(NoteReminderClient.class);
 
         Call<ListResultat> call = client.removeNote(note.getId());
 
         call.enqueue(new Callback<ListResultat>() {
+            //suppressio ok
             @Override
             public void onResponse(Call<ListResultat> call, Response<ListResultat> response) {
                 ListResultat resultat = response.body();
@@ -123,12 +126,13 @@ public class NoteDetailActivity extends AppCompatActivity {
                 //Toast.makeText(NoteDetailActivity.this, "Suppression de la note OK : "+resultat.toString(),Toast.LENGTH_LONG).show();
                 //Log.i("Notes","Suppression de la note OK : "+resultat.toString());
 
-                // and show the note list
+                //on redirige sur la liste des notes
                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                 intent.putExtra("actionType","deletion");
                 startActivity(intent);
             }
 
+            //erreur suppression, on reste sur la meme vue et on affiche un message
             @Override
             public void onFailure(Call<ListResultat> call, Throwable t) {
                 Toast.makeText(getApplicationContext(),"Erreur pendant la suppression de la note",Toast.LENGTH_LONG).show();

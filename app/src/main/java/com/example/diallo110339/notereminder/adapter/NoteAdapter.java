@@ -30,6 +30,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+//adaptateur de la liste des notes
 public class NoteAdapter extends
         RecyclerView.Adapter<NoteAdapter.MyViewHolder>
         implements ItemTouchHelperAdapter{
@@ -37,6 +38,7 @@ public class NoteAdapter extends
     private List<Note> noteList;
     private Note note;
     private ItemTouchHelper touchHelper;
+    public boolean delete;
 
     /**
      * View holder class
@@ -131,33 +133,45 @@ public class NoteAdapter extends
         return true;
     }
 
+    //aprsès un swap, on affiche un snackbar pour permettre au user d'annuler la suppression
     public void onItemRemove(final RecyclerView.ViewHolder viewHolder, final RecyclerView mRecyclerView, final int position){
         note = noteList.get(position);
         noteList.remove(position);
         notifyItemRemoved(position);
+        //notifyDataSetChanged();
+        Log.i("swap", "pos : "+position + ", notes : "+ noteList);
 
+        //après un swap, on affiche
+        delete=true;
         Snackbar snackbar = Snackbar
-                .make(mRecyclerView , R.string.item_removed, Snackbar.LENGTH_LONG)
+                .make( viewHolder.itemView , R.string.item_removed, Snackbar.LENGTH_LONG)
+                //on afficher l'option annulé et s'il click, on met delete a false
                 .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        restoreItem(note,position);
+                        //on demande de ne pas supprimer
+                        delete=false;
                     }
                 })
+                //si le snackbar disparait sans qu'il n'ait annulé, on envoi la requete de suppresion au serveur
                 .setCallback(new Snackbar.Callback() {
+
+
                     @Override
                     public void onDismissed(Snackbar snackbar, int event) {
                         super.onDismissed(snackbar, event);
                         //send delete request to the API
-                        deleteNote(position);
+                        if (delete)
+                            deleteNote(position);
+                        else
+                            restoreItem(note,position);
                     }
                 });
         snackbar.show();
 
     }
 
-
-
+    //fonction qui permet de supprimer un note après un swap
     public  void deleteNote(final int position){
         NoteReminderClient client = MainActivity.getClient().create(NoteReminderClient.class);
 
@@ -166,12 +180,14 @@ public class NoteAdapter extends
         call.enqueue(new Callback<ListResultat>() {
             @Override
             public void onResponse(Call<ListResultat> call, Response<ListResultat> response) {
+                //si la suppression marche, on affiche un message
                 ListResultat resultat = response.body();
                 Toast.makeText(MyApplication.getAppContext(),"La note a été supprimée avec succès.",Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFailure(Call<ListResultat> call, Throwable t) {
+                //si la suppression echoue, on restore et on affiche un message
                 restoreItem(note,position);
                 Log.i("Notes","Erreur pendant la suppression de la note "+t.toString() + " " + t.getStackTrace());
                 Toast.makeText(MyApplication.getAppContext(),"Erreur de suppression de la note.",Toast.LENGTH_LONG).show();
@@ -179,6 +195,7 @@ public class NoteAdapter extends
         });
     }
 
+    //après un changment de position on demande de reordonner les notes
     public void switchNotes(int fromPosition, int toPosition){
         Note note1 = noteList.get(fromPosition);
         Note note2 = noteList.get(toPosition);

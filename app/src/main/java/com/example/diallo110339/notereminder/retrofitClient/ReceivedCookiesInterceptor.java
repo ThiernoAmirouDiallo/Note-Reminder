@@ -1,6 +1,4 @@
-package com.example.diallo110339.notereminder.retrofitClient; /**
- * Created by coderzlab on 22/2/17.
- */
+package com.example.diallo110339.notereminder.retrofitClient;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -8,8 +6,7 @@ import java.util.HashSet;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 /**
- * This Interceptor add all received Cookies to the app DefaultPreferences.
- * Your implementation on how to save the Cookies on the Preferences may vary.
+ * Sauvegarde des cookies se trouvant dans les reponse http du serveur dans le preferences
  */
 public class ReceivedCookiesInterceptor implements Interceptor {
     @Override

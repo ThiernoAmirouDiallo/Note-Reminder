@@ -6,6 +6,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+//gestion des evenement sur le element de la liste
 public class RecyclerItemListener
         implements RecyclerView.OnItemTouchListener  {
 

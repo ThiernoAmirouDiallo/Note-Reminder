@@ -1,7 +1,6 @@
 package com.example.diallo110339.notereminder;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,14 +26,6 @@ import com.example.diallo110339.notereminder.retrofitClient.AddCookiesIntercepto
 import com.example.diallo110339.notereminder.retrofitClient.NoteReminderClient;
 import com.example.diallo110339.notereminder.retrofitClient.ReceivedCookiesInterceptor;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,16 +47,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "http://daviddurand.info/D228/reminder/";
     private static Retrofit retrofit = null;
 
+    NoteAdapter na;
     List<Note> notes = new ArrayList<>();
     RelativeLayout progressBarRelativeLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //enabling auto cookies management
-        //CookieManager cookieManager = new CookieManager();
-        //CookieHandler.setDefault(cookieManager);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -75,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         progressBarRelativeLayout = (RelativeLayout) findViewById(R.id.progressBarRelativeLayout);
         noteListView = (RecyclerView) findViewById(R.id.noteListView);
 
-        //on vérifie si on arrive ici après une suppression de note
+        //on vérifie si on arrive ici après une suppression de note ou une suppression ou encore une modification
         Intent intent = getIntent();
         String lastActionType = intent.getStringExtra("actionType");
         if (lastActionType != null && lastActionType.equals("deletion"))
@@ -96,42 +84,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setListContent();
-
-        /* / Getting SwipeContainerLayout
-        swipeLayout = findViewById(R.id.swipeContainer);
-        // Adding Listener
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Your code here
-                //Toast.makeText(getApplicationContext(), "Works!", Toast.LENGTH_LONG).show();
-                setListContent();
-
-                // To keep animation for 4 seconds
-                new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
-                        // Stop animation (This will be after 3 seconds)
-                        swipeLayout.setRefreshing(false);
-                    }
-                }, 4000); // Delay in millis
-            }
-        });
-
-        // Scheme colors for animation
-        swipeLayout.setColorSchemeColors(
-                getResources().getColor(android.R.color.darker_gray),
-                getResources().getColor(android.R.color.holo_green_light),
-                getResources().getColor(android.R.color.holo_orange_light),
-                getResources().getColor(android.R.color.holo_red_light)
-
-        );
-*/
-
-
     }
 
+    //connexion au serveur et recuperation de la liste puis appel de la fonction de remplissage de la vue
     private void setListContent() {
-
+        //a l'actualisaion, on afficher le loading et masque la liste
         showLoading();
 
         NoteReminderClient client = getClient().create(NoteReminderClient.class);
@@ -163,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
                         //affectation du resultat a la liste
                         notes=resultat.getData();
                         fillList();
+                        //on affiche la liste des notes
                         showList();
                     }
 
@@ -170,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onFailure(Call<ListResultat> call, Throwable t) {
                         //Toast.makeText(getApplicationContext(),"Impossible de recuperer la liste des notes ",Toast.LENGTH_LONG).show();
                         Log.i("Notes","Impossible de recuperer la liste des notes  : "+t.toString() + " " + t.getStackTrace());
+                        //on affiche la liste des notes
                         showList();
 
                     }
@@ -185,19 +144,35 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    //affichage des la liste des notes
     public void showList(){
         progressBarRelativeLayout.setVisibility(View.GONE);
         noteListView.setVisibility(View.VISIBLE);
     }
 
+    //affichage du loading (message d'actualisation)
     public void showLoading(){
         noteListView.setVisibility(View.GONE);
         progressBarRelativeLayout.setVisibility(View.VISIBLE);
     }
 
+    //remplissage du RecyclerView après recuperation de la liste
     public void fillList(){
+        //trie de la liste
         Collections.sort(notes);
-        NoteAdapter na = new NoteAdapter(notes);
+
+        //si c'est une actualisation?
+        if (na!= null)
+        {
+            Log.i("info", "actualisation");
+            na.notifyDataSetChanged();
+            return;
+        }
+        else
+            Log.i("info", "Creation de la liste");
+
+
+        na = new NoteAdapter(notes);
         noteListView.setAdapter(na);
 
 
@@ -206,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         noteListView.setLayoutManager(llm);
 
+        //affichage de la vue de details de la note après click dans la liste
         noteListView.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), noteListView,
                 new RecyclerItemListener.RecyclerTouchListener() {
                     public void onClickItem(View v, int position) {
@@ -264,6 +240,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //ajout
+    //a l'ajout, on donne a la vue le plus petit ordre des notes ou 1000 si n'y a pas de notes (liste vide)
+    //avant ajout, il decrementeta cet ordre pour le donner a la nouvelle note créee ce qui la placera en tete de liste
     public void addNote(){
         //on recupere le plus petit ordre ou 1000 (pour decrementer par la suit)
         Integer smallestOrder=notes.size()>0?notes.get(0).getOrdre():1000;
@@ -275,185 +254,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public class DownloadTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... urls) {
-
-            String result = "";
-            URL url;
-            HttpURLConnection urlConnection = null;
-
-            try {
-                url = new URL(urls[0]);
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-
-                InputStream in = urlConnection.getInputStream();
-
-                InputStreamReader reader = new InputStreamReader(in);
-
-                int data = reader.read();
-
-                while (data != -1) {
-
-                    char current = (char) data;
-
-                    result += current;
-
-                    data = reader.read();
-
-                }
-
-                return result;
-
-            } catch (Exception e) {
-
-                Toast.makeText(getApplicationContext(), "Erreur de connexion", Toast.LENGTH_LONG);
-
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.i("Result", result);
-
-            super.onPostExecute(result);
-
-            try {
-
-                String message = "";
-
-                JSONObject jsonObject = new JSONObject(result);
-
-                String data = jsonObject.getString("data");
-
-                Log.i("API content", data);
-
-                JSONArray arr = new JSONArray(data);
-
-                //building the notes list
-
-                for (int i = 0; i < arr.length(); i++) {
-
-                    JSONObject jsonPart = arr.getJSONObject(i);
-
-                    Integer id = Integer.parseInt(jsonPart.getString("id"));
-                    String user=jsonPart.getString("user");
-                    String tache=jsonPart.getString("tache");
-                    String echeance=jsonPart.getString("echeance");
-                    int ordre=Integer.parseInt(jsonPart.getString("ordre"));
-                    String couleur=jsonPart.getString("couleur");
-
-                    if (id != null || tache != "") {
-                        notes.add(new Note(id,user,tache,echeance,ordre,couleur));
-                    }
-
-                }
-
-                if (notes.size()<1) {
-
-                    Toast.makeText(getApplicationContext(), "Aucune tache trouvée", Toast.LENGTH_LONG).show();
-
-                }
-                else {
-                    fillList();
-                }
-
-
-            } catch (JSONException e) {
-
-                Toast.makeText(getApplicationContext(), "Erreur de lecture des taches", Toast.LENGTH_LONG).show();
-
-            }
-
-
-
-        }
-    }
-
-    public class ConnTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... urls) {
-
-            String result = "";
-            URL url;
-            HttpURLConnection urlConnection = null;
-
-            try {
-                url = new URL(urls[0]);
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-
-                InputStream in = urlConnection.getInputStream();
-
-                InputStreamReader reader = new InputStreamReader(in);
-
-                int data = reader.read();
-
-                while (data != -1) {
-
-                    char current = (char) data;
-
-                    result += current;
-
-                    data = reader.read();
-
-                }
-
-                return result;
-
-            } catch (Exception e) {
-
-                Toast.makeText(getApplicationContext(), "Erreur de connexion ->", Toast.LENGTH_LONG);
-
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            try {
-
-                String message = "";
-
-                JSONObject jsonObject = new JSONObject(result);
-
-                String data = jsonObject.getString("message");
-
-
-                Log.i("API Res connection", data);
-
-                //si connexion ok
-                if (data.equals("ok"))
-                {
-                    Log.i("API Conn OK->", data);
-
-                    DownloadTask task = new DownloadTask();
-                    task.execute("http://daviddurand.info/D228/reminder/list");
-                }
-                else{
-                    Log.i("API Erreur", "Connexion impossible "+data);
-                        Toast.makeText(getApplicationContext(), "Connexion impossible "+ data, Toast.LENGTH_LONG).show();
-                }
-
-
-
-            } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), "Erreur pendant la connexion", Toast.LENGTH_LONG).show();
-            }
-
-
-
-        }
-    }
-
+    //Singleton qui renvoi le client retrofit parametre
     public static Retrofit getClient() {
         if (retrofit==null) {
             //OkHttpClient.Builder client = new OkHttpClient.Builder();
@@ -461,12 +262,15 @@ public class MainActivity extends AppCompatActivity {
                     .connectTimeout(60 * 5, TimeUnit.SECONDS)
                     .readTimeout(60 * 5, TimeUnit.SECONDS)
                     .writeTimeout(60 * 5, TimeUnit.SECONDS);
+            //Si une reponse contient des cookies, on les sauvegarde
             okHttpClient.interceptors().add(new AddCookiesInterceptor());
+            //on injecte les cookies sauvegardés avant envoi de la requete au serveur
             okHttpClient.interceptors().add(new ReceivedCookiesInterceptor());
 
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(okHttpClient.build())
+                    //parametrage de la serialisation et deserialisation de facon automatique
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }

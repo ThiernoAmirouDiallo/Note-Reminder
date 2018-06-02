@@ -16,7 +16,8 @@
         android:maxLines="1"
         android:paddingLeft="15dp"
         android:text="TextView"
-        android:textSize="35sp" />
+        android:textSize="35sp"
+        android:layout_alignParentLeft="true" />
 
     <TextView
         android:id="@+id/echeanceTextView"
@@ -38,5 +39,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_action_reorder" />
+        app:srcCompat="@drawable/ic_action_reorder"
+        android:layout_alignParentRight="true" />
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.example.diallo110339.notereminder.entity;
 
+//result de l'aip après ajout ou modification d'une note
 public class AjoutModifResultat {
     String code;
     String message;

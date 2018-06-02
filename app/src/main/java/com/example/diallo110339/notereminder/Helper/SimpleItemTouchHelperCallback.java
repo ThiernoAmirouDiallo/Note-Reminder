@@ -3,6 +3,8 @@ package com.example.diallo110339.notereminder.Helper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
+//gestion des evenements du reclycler view contenant la liste des notes
+//drag&drop, swap
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     int dragFrom = -1;

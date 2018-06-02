@@ -11,6 +11,10 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
+//configuration du retrofit client
+//il permet de delarer les urls a appeler en donnant les parametres et les types de retours.
+//il se charge en suite de l'implemention de meme que la serialisation
+// et la deserialisation des objets en parametre en en retour des appels
 public interface NoteReminderClient {
     @GET("connect/{user}/{password}")
     Call<ConnResultat> connect(@Path("user") String user, @Path("password") String password);

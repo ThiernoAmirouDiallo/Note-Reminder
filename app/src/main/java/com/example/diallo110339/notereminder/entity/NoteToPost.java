@@ -1,5 +1,9 @@
 package com.example.diallo110339.notereminder.entity;
 
+//note a posté
+//pour ce projet en particulier il n'y avait pas forcement besoin de cetle classe
+// puisque ce n'est pas un objet qui est posté mais plutot des parametre url encodé
+//mais pour bien organisé, j'ai preféré la garde
 public class NoteToPost {
     Integer id;
     String texte;

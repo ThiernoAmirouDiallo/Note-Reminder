@@ -1,6 +1,4 @@
-package com.example.diallo110339.notereminder.retrofitClient; /**
- * Created by coderzlab on 22/2/17.
- */
+package com.example.diallo110339.notereminder.retrofitClient;
 import android.util.Log;
 
 import java.io.IOException;
@@ -10,8 +8,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 /**
- * This interceptor put all the Cookies in Preferences in the Request.
- * Your implementation on how to get the Preferences may vary.
+ * Ajoute des cookies enregistrés dans la requete
  */
 public class AddCookiesInterceptor implements Interceptor {
     @Override

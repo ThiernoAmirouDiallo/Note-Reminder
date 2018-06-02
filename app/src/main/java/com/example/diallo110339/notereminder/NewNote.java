@@ -38,23 +38,15 @@ import retrofit2.Response;
 public class NewNote extends AppCompatActivity {
 
     Spinner spinner;
-    public static final String[] couleursNames = {"ROUGE",
-            "ORANGE",
-            "JAUNE",
-            "VIOLET",
-            "MAGENTA",
-            "BLUE VIOLET",
-            "VERT",
-            "BLEU",
-            "OR",
-            "BLANC",
-            "BEIGE",
-            "ARGENT",
-            "GRIS",
-            "NOIR"
-    };
+    //nom des couleurs
+    public static final String[] couleursNames = {"ROUGE","ORANGE","JAUNE","VIOLET","MAGENTA","BLUE VIOLET","VERT","BLEU","OR","BLANC","BEIGE","ARGENT","GRIS","NOIR"};
+    //codes des couleurs
     public static final String[] couleursCodes = {"#FF0000","#FFA500","#FFFF00","#EE82EE","#FF00FF","#8A2BE2","#008000","#0000FF","#DAA520","#FFFFFF","#F5F5DC","#C0C0C0","#808080","#000000"};
+
+    //calendrier
     Calendar myCalendar = Calendar.getInstance();
+
+    //element de la vue
     EditText edittext;
     Button editButton;
     TextView colorTextViewPreview;
@@ -87,19 +79,18 @@ public class NewNote extends AppCompatActivity {
         loadingSpinner= (ProgressBar) findViewById(R.id.progressBar);
         spinner = (Spinner)findViewById(R.id.couleurSpinner);
 
+        //preparatoin de la selection des couleurs
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(NewNote.this,
                 android.R.layout.simple_spinner_item,couleursNames);
-
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                //onItemSelected(parent,view,position,id);
+                //après select d'une couleur, on met a jour le pre visualisation
                 colorTextViewPreview.setBackgroundColor(Color.parseColor(couleursCodes[spinner.getSelectedItemPosition()]));
                 //Toast.makeText(getApplicationContext(),couleursNames[spinner.getSelectedItemPosition()],Toast.LENGTH_LONG).show();
-
             }
 
             @Override
@@ -108,6 +99,7 @@ public class NewNote extends AppCompatActivity {
             }
         });
 
+        //preparation de l'intent de redirection après succès
         Intent intent =getIntent();
         typeCrud=intent.getStringExtra("typeCrud");
         if (typeCrud.equals("ADD"))
@@ -115,14 +107,15 @@ public class NewNote extends AppCompatActivity {
             smallestOrder =Integer.parseInt(intent.getStringExtra("smallestOrder"));
             submitButton.setText("Valider");
 
-            //mettre des couleurs par defaut de façon aleatoire
+            //mettre des couleurs par defaut de façon aleatoire de [0 - nombredecoulerur -1 ]
             int randomPosition =new Random().nextInt(this.couleursCodes.length);
             spinner.setSelection(randomPosition);
             //colorTextViewPreview.setBackgroundColor(Color.parseColor(couleursCodes[randomPosition]));
         }
         else {
+            //recuperation dans l'intent de la note a modifier
             note = (Note) intent.getSerializableExtra("noteObj");
-
+            //mise a jour des champs
             edittext.setText(note.getEcheance());
             tacheEditText.setText(note.getTache());
             submitButton.setText("Modifier");
@@ -136,6 +129,7 @@ public class NewNote extends AppCompatActivity {
 
         //Toast.makeText(getApplicationContext(),smallestOrder+note.toString(),Toast.LENGTH_LONG).show();
 
+        //parametrage du date picker
         date = new DatePickerDialog.OnDateSetListener() {
 
             @Override
@@ -145,11 +139,13 @@ public class NewNote extends AppCompatActivity {
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                //affichage de la date selectionée
                 updateLabel();
             }
 
         };
 
+        //après click sur le bouton de selection des dates, on affiche le calendrier
         editButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -160,21 +156,9 @@ public class NewNote extends AppCompatActivity {
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
-
-        edittext.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                new DatePickerDialog(NewNote.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-
-
     }
 
+    //affichage de la date selectionnée
     private void updateLabel() {
         String myFormat = "dd/MM/yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.FRANCE);
@@ -183,6 +167,7 @@ public class NewNote extends AppCompatActivity {
     }
 
 
+    //click sur le boutton de retour
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here
@@ -193,6 +178,7 @@ public class NewNote extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //ajout de la note et si ok, on retourne sur la liste
     public  void addNote(){
         NoteReminderClient client = MainActivity.getClient().create(NoteReminderClient.class);
 
@@ -206,6 +192,7 @@ public class NewNote extends AppCompatActivity {
         Call<AjoutModifResultat> call = client.addNote(note.getTexte(),note.getO(),note.getC(),note.getE());
 
         call.enqueue(new Callback<AjoutModifResultat>() {
+            //si succès
             @Override
             public void onResponse(Call<AjoutModifResultat> call, Response<AjoutModifResultat> response) {
                 AjoutModifResultat resultat = response.body();
@@ -218,8 +205,10 @@ public class NewNote extends AppCompatActivity {
                 startActivity(intent);
             }
 
+            //si erreur avec l'api
             @Override
             public void onFailure(Call<AjoutModifResultat> call, Throwable t) {
+                //affiche le boutton pour ressoumission et un message
                 showButton();
                 Toast.makeText(getApplicationContext(),"Impossible d'ajouter la note ",Toast.LENGTH_LONG).show();
                 //Log.i("Notes","Impossible d'ajouter la note : "+t.toString() + " " + t.getStackTrace());
@@ -228,6 +217,7 @@ public class NewNote extends AppCompatActivity {
         });
     }
 
+    //modification
     public  void editNote(){
         NoteReminderClient client = MainActivity.getClient().create(NoteReminderClient.class);
         NoteToPost note =new NoteToPost();
@@ -240,6 +230,7 @@ public class NewNote extends AppCompatActivity {
         Call<AjoutModifResultat> call = client.updateNote(note.getId(),note.getId(),note.getTexte(),note.getO(),note.getC(),note.getE());
 
         call.enqueue(new Callback<AjoutModifResultat>() {
+            //si succès
             @Override
             public void onResponse(Call<AjoutModifResultat> call, Response<AjoutModifResultat> response) {
                 AjoutModifResultat resultat = response.body();
@@ -252,8 +243,10 @@ public class NewNote extends AppCompatActivity {
                 startActivity(intent);
             }
 
+            //si erreur
             @Override
             public void onFailure(Call<AjoutModifResultat> call, Throwable t) {
+                //affiche le boutton pour ressoumission et un message
                 showButton();
                 Toast.makeText(getApplicationContext(),"Impossible de modifier la note ",Toast.LENGTH_LONG).show();
                 //Log.i("Notes","Impossible de modifier la note : "+t.toString() + " " + t.getStackTrace());
@@ -262,9 +255,11 @@ public class NewNote extends AppCompatActivity {
         });
     }
 
+    //click sur le boutton de validation
     public void submitForm(View v){
-        //validation du formulaire
+        //on masque le boutton et on affiche le spinner (loading)
         showSpiner();
+        //validation du formulaire
         if(tacheEditText.getText().length()<2)
         {
             Toast.makeText(getApplicationContext(),"Saisissez une description pour la tache d'au moins 2 caractères",Toast.LENGTH_LONG).show();
@@ -280,23 +275,27 @@ public class NewNote extends AppCompatActivity {
             return;
         }
 
-        //execution
+        //si ajout on appelle le fonction ajout
         if (typeCrud.equals("ADD"))
             addNote();
         else
+            //sinon on appelle la fonction de modification
             editNote();
     }
-
+    //affichage du boutton et on masque le loading
     private void showButton() {
         loadingSpinner.setVisibility(View.GONE);
         submitButton.setVisibility(View.VISIBLE);
     }
 
+    //on masque le boutton et on afficher le loading
     private void showSpiner() {
         loadingSpinner.setVisibility(View.VISIBLE);
         submitButton.setVisibility(View.GONE);
     }
 
+    //recupeation de la position a partir du code de la couleur
+    //utilisé pour affiché le nom de la couleur correspondante dans la vue de details des note
     public static int getColorIndex(String couleur) {
         int colorPosition =-1;
 

@@ -1,5 +1,6 @@
 package com.example.diallo110339.notereminder.entity;
 
+//resultat de l'api après connection
 public class ConnResultat {
     String code;
     String message;

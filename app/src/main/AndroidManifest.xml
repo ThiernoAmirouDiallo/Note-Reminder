@@ -25,9 +25,6 @@
         <activity
             android:name=".NewNote"
             android:label="Nouvelle Note" />
-        <activity
-            android:name=".EditNote"
-            android:label="Modifier une Note" />
         <activity android:name=".NoteDetailActivity"></activity>
     </application>
 

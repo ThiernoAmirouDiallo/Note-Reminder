@@ -2,6 +2,7 @@ package com.example.diallo110339.notereminder.entity;
 
 import java.util.List;
 
+//resultat de l'api donnant la liste des notes
 public class ListResultat {
     String code;
     String message;

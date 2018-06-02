@@ -4,6 +4,11 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
+//l'entie note se trouvant dans la liste des notes
+//cette note implement l'interface Comparable qui permet de trier la liste des notes (ce qui est fait après
+//la recuperation depuis le serveur des notes (malgré que l'api fourni une liste triée ce qui pourrait remplacer cela
+//par exemple avec ca, on peut trier comme on veut par odre croissant decroissant, par echeance, ... en ajoutant un champ type trie statique dans la liste
+//qu'on test dans la methode compareTo
 public class Note implements Serializable, Comparable<Note>{
     Integer id;
     String user;

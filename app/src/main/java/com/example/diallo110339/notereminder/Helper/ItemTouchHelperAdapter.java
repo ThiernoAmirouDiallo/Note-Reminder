@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.example.diallo110339.notereminder.entity.Note;
 
+//interface implementée par l'adaptateur du recycler view contenant la liste des notes
 public interface ItemTouchHelperAdapter {
 
     boolean onItemMove(int fromPosition, int toPosition);
